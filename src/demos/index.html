@@ -26,10 +26,12 @@
           },
           remove: function () {
             console.log('Removing comment');
+            this.props.deleteFromBoard(this.props.index)//pass index as param since deleteFromBoard uses removeComment whose function takes an index as a param
           },
           save: function (){
-            var val = this.refs.newText.value;
-            console.log('New Comment: ' + val);
+            // var val = this.refs.newText.value;
+            // console.log('New Comment: ' + val);
+            this.props.updateCommentText(this.refs.newText.value, this.props.index);//pass newText as well as index of comment
             this.setState({editing: false});
           },
           renderNormal: function (){
@@ -68,14 +70,33 @@
               ]
             }
           },
+          //remove index i from comment
+          removeComment: function (i){
+            console.log('Removing Comment: ' +i);
+            var arr = this.state.comments;//get current state of array
+            arr.splice(i,1);//only remove 1 element which is index i
+            this.setState({comments: arr});//set the new state of the array after splice
+          },
+          //function takes the new text entered plus the index of the comment
+          updateComment: function (newText,i) {
+            console.log('Updating Comment');
+            var arr = this.state.comments;
+            arr[i] = newText;
+            this.setState({comments: arr});
+          },
+          eachComment:function (text,i) {
+            //use key (counter) and index to add unique key identifier to each component
+            return (
+                    // add 2 properties to each component containing functions to update and remove, which were created in Board component
+                    <Comment key={i} index={i} updateCommentText = {this.updateComment} deleteFromBoard = {this.removeComment}>
+                    {text}
+                    </Comment>);
+          },
         render: function () {
           return (
+                  //call eachComment on each comment in array
                   <div className = "board">
-                      {
-                        this.state.comments.map(function(text,i){
-                          return (<Comment key={i}>{text}</Comment>);
-                        })
-                      }
+                      {this.state.comments.map(this.eachComment)}
                   </div>
                 );
           }
